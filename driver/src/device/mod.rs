@@ -18,6 +18,10 @@ pub(crate) use gsusb::*;
 const USB_VID: u16 = 0x1d50;
 const USB_PID: u16 = 0x606f;
 
+// CAN Debugger USB VID / PID
+const CAN_DEBUGGER_USB_VID: u16 = 0x16d0;
+const CAN_DEBUGGER_USB_PID: u16 = 0x10b8;
+
 // buffer size for control in/out transfers
 const CTRL_BUF_SIZE: usize = 64;
 // number of bulk in transfers
@@ -119,9 +123,12 @@ extern "system" fn bulk_in_cb(xfer: *mut libusb_transfer) {
 
 impl Device {
     pub(crate) fn new(ctx: UsbContext) -> Result<Device, Error> {
-        let hnd = unsafe { libusb_open_device_with_vid_pid(ctx.as_ptr(), USB_VID, USB_PID) };
+        let mut hnd = unsafe { libusb_open_device_with_vid_pid(ctx.as_ptr(), USB_VID, USB_PID) };
         if hnd.is_null() {
-            return Err(Error::DeviceNotFound);
+            hnd = unsafe { libusb_open_device_with_vid_pid(ctx.as_ptr(), CAN_DEBUGGER_USB_VID, CAN_DEBUGGER_USB_PID) };
+            if hnd.is_null() {
+                return Err(Error::DeviceNotFound);
+            }
         }
 
         match unsafe { libusb_detach_kernel_driver(hnd, 0) } {

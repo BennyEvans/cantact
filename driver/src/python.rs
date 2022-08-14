@@ -5,7 +5,7 @@ use pyo3::exceptions;
 use pyo3::prelude::*;
 use pyo3::types::PyDict;
 
-#[pyclass(name = Interface)]
+#[pyclass(unsendable, name = Interface)]
 struct PyInterface {
     i: Interface,
     rx_recv: Receiver<Frame>,

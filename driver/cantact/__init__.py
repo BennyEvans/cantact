@@ -1,1 +1,1 @@
-from cantact import *
+from .cantact import *
